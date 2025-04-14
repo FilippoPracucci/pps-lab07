@@ -42,9 +42,61 @@ class LoggingRobot(val robot: Robot) extends Robot:
     robot.act()
     println(robot.toString)
 
+class RobotWithBattery(val robot: Robot, private var _battery: Int = 100) extends Robot:
+  export robot.{position, direction, turn}
+  def battery: Int = _battery
+  private def batteryDec(): Unit = _battery -= 20
+
+  override def act(): Unit =
+    if battery >= 20 then
+      robot.act()
+      batteryDec()
+      println(s"${robot.toString} - battery: $battery%")
+    else
+      println(s"Not enough battery ($battery%) to perform the action")
+      throw IllegalStateException("Not enough battery ($battery%) to perform the action")
+
+class RobotCanFail(val robot: Robot, val failProb: Double) extends Robot:
+  export robot.{position, direction, turn}
+  override def act(): Unit =
+    if Math.random() < failProb then
+      robot.act()
+      println(s"Robot succeeded performing the action: ${robot.toString}")
+    else
+      println(s"Robot failed to perform the action (failure probability: ${failProb * 100}%)")
+
+class RobotRepeated(val robot: Robot, val rep: Int) extends Robot:
+  export robot.{position, direction, turn}
+  override def act(): Unit =
+    for
+      i <- 0 until rep
+    do
+      robot.act()
+      println(robot.toString)
+
 @main def testRobot(): Unit =
   val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
   robot.act() // robot at (0, 1) facing North
   robot.turn(robot.direction.turnRight) // robot at (0, 1) facing East
   robot.act() // robot at (1, 1) facing East
   robot.act() // robot at (2, 1) facing East
+
+  val batteryRobot = RobotWithBattery(SimpleRobot((0, 0), Direction.North))
+  batteryRobot.act()
+  batteryRobot.battery.getClass
+  batteryRobot.act()
+  batteryRobot.act()
+  batteryRobot.act()
+  batteryRobot.turn(batteryRobot.direction.turnRight)
+  batteryRobot.act()
+  batteryRobot.act()
+
+  val canFailRobot = RobotCanFail(SimpleRobot((0, 0), Direction.North), 0.40)
+  canFailRobot.act()
+  canFailRobot.act()
+  canFailRobot.act()
+
+  val repeatedRobot = RobotRepeated(SimpleRobot((0, 0), Direction.North), 3)
+  repeatedRobot.act()
+  repeatedRobot.turn(repeatedRobot.direction.turnLeft)
+  repeatedRobot.act()
