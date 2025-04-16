@@ -59,7 +59,7 @@ class RobotWithBattery(val robot: Robot, private var _battery: Int = 100) extend
 class RobotCanFail(val robot: Robot, val failProb: Double) extends Robot:
   export robot.{position, direction, turn}
   override def act(): Unit =
-    if Math.random() < failProb then
+    if Math.random() > failProb then
       robot.act()
       println(s"Robot succeeded performing the action: ${robot.toString}")
     else
@@ -75,13 +75,14 @@ class RobotRepeated(val robot: Robot, val rep: Int) extends Robot:
       println(robot.toString)
 
 @main def testRobot(): Unit =
-  val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
+  import Direction.*
+  val robot = LoggingRobot(SimpleRobot((0, 0), North))
   robot.act() // robot at (0, 1) facing North
   robot.turn(robot.direction.turnRight) // robot at (0, 1) facing East
   robot.act() // robot at (1, 1) facing East
   robot.act() // robot at (2, 1) facing East
 
-  val batteryRobot = RobotWithBattery(SimpleRobot((0, 0), Direction.North))
+  val batteryRobot = RobotWithBattery(SimpleRobot((0, 0), North))
   batteryRobot.act()
   batteryRobot.battery.getClass
   batteryRobot.act()
@@ -91,12 +92,12 @@ class RobotRepeated(val robot: Robot, val rep: Int) extends Robot:
   batteryRobot.act()
   batteryRobot.act()
 
-  val canFailRobot = RobotCanFail(SimpleRobot((0, 0), Direction.North), 0.40)
+  val canFailRobot = RobotCanFail(SimpleRobot((0, 0), North), 0.40)
   canFailRobot.act()
   canFailRobot.act()
   canFailRobot.act()
 
-  val repeatedRobot = RobotRepeated(SimpleRobot((0, 0), Direction.North), 3)
+  val repeatedRobot = RobotRepeated(SimpleRobot((0, 0), North), 3)
   repeatedRobot.act()
   repeatedRobot.turn(repeatedRobot.direction.turnLeft)
   repeatedRobot.act()
