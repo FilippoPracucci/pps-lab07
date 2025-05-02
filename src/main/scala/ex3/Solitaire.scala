@@ -9,7 +9,7 @@ object Solitaire extends App:
   private val height = 5
   private val initialMark: Mark = (width / 2, height / 2)
 
-  @main def run() = placeMarks().zipWithIndex foreach render
+  @main def run(): Unit = placeMarks().zipWithIndex foreach render
 
   def placeMarks(n: Int = width * height)(using factory: IterableFactory): Iterable[Solution] = n match
     case 1 => factory(Seq(initialMark))
