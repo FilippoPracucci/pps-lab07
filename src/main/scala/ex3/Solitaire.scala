@@ -24,24 +24,23 @@ object Solitaire extends App:
       yield
         marks.toSeq :+ mark
 
-  def isFree(mark: Mark, marks: Iterable[Mark]): Boolean =
-    isInBounds(mark) && !marks.exists(_ == mark)
-
-  def isInBounds(mark: Mark): Boolean =
-    mark._1 >= 0 && mark._1 < width && mark._2 >= 0 && mark._2 < height
-
-  def isValid(mark: Mark, marks: Iterable[Mark]): Boolean =
-    (mark._1 == marks.last._1 && (mark._2 - marks.last._2).abs == 3) ||
-      (mark._2 == marks.last._2 && (mark._1 - marks.last._1).abs == 3) ||
-      ((mark._1 - marks.last._1).abs == (mark._2 - marks.last._2).abs && (mark._1 - marks.last._1).abs == 2)
-
   def render(solution: (Solution, Int)): Unit =
-    println()
-    println(s"Solution ${solution._2 + 1}")
+    println(s"\nSolution ${solution._2 + 1}")
     val rows =
       for y <- 0 until height
           row = for x <- 0 until width
-          number = solution._1.toSeq.indexOf((x, y)) + 1
+                    number = solution._1.toSeq.indexOf((x, y)) + 1
           yield if number > 0 then "%-2d ".format(number) else "X  "
       yield row.mkString
     println(rows.mkString("\n"))
+
+  private def isFree(mark: Mark, marks: Iterable[Mark]): Boolean =
+    isInBounds(mark) && !marks.exists(_ == mark)
+
+  private def isInBounds(mark: Mark): Boolean =
+    mark._1 >= 0 && mark._1 < width && mark._2 >= 0 && mark._2 < height
+
+  private def isValid(mark: Mark, marks: Iterable[Mark]): Boolean =
+    (mark._1 == marks.last._1 && (mark._2 - marks.last._2).abs == 3) ||
+      (mark._2 == marks.last._2 && (mark._1 - marks.last._1).abs == 3) ||
+      ((mark._1 - marks.last._1).abs == (mark._2 - marks.last._2).abs && (mark._1 - marks.last._1).abs == 2)

@@ -46,31 +46,26 @@ class RobotWithBattery(val robot: Robot, private var _battery: Int = 100) extend
   export robot.{position, direction, turn}
   def battery: Int = _battery
   private def batteryDec(): Unit = _battery -= 20
-
-  override def act(): Unit =
-    if battery >= 20 then
-      robot.act()
+  override def act(): Unit = battery match
+    case b if b >= 20 => robot.act()
       batteryDec()
       println(s"${robot.toString} - battery: $battery%")
-    else
-      println(s"Not enough battery ($battery%) to perform the action")
+    case _ => println(s"Not enough battery ($battery%) to perform the action")
       throw IllegalStateException("Not enough battery ($battery%) to perform the action")
 
 class RobotCanFail(val robot: Robot, val failProb: Double) extends Robot:
   export robot.{position, direction, turn}
-  override def act(): Unit =
-    if Math.random() > failProb then
-      robot.act()
+  override def act(): Unit = Math.random() match
+    case num if num >= failProb => robot.act()
       println(s"Robot succeeded performing the action: ${robot.toString}")
-    else
-      println(s"Robot failed to perform the action (failure probability: ${failProb * 100}%)")
+    case _ => println(s"Robot failed to perform the action (failure probability: ${failProb * 100}%)")
 
 class RobotRepeated(val robot: Robot, val rep: Int) extends Robot:
   export robot.{position, direction, turn}
   override def act(): Unit =
     for
       i <- 0 until rep
-    do
+    yield
       robot.act()
       println(robot.toString)
 
